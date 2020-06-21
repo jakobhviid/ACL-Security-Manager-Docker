@@ -1,0 +1,27 @@
+version: "3"
+
+services:
+  zoo:
+    image: cfei/zookeeper:2.0.0-beta
+    container_name: zookeeper
+    restart: always
+    ports:
+      - 2181:2181
+      - 2888:2888
+      - 3888:3888
+    environment:
+      ZOO_ID: 1
+      ZOO_PORT: 2181
+
+  acl-manager:
+    image: omvk97/acl-security-manager-docker
+    container_name: acl-manager
+    ports:
+      - 9000:9000
+    environment:
+      AUTHORIZER_ZOOKEEPER_CONNECT: zoo:2181
+      ACL_KERBEROS_ZOOKEEPER_PRINCIPAL: zookeeper/localhost@CFEI.SECURE
+      ACL_API_PORT: 9000
+      ACL_API_KEY: password
+    volumes: 
+      - ./zookeeper.service.keytab:/conf/zkclient.keytab

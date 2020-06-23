@@ -6,5 +6,8 @@ namespace API.DTOs.inputDTOs
     {
         [Required]
         public string APIKey { get; set; }
+
+        [Required]
+        public string PrincipalName { get; set; }
     }
 }

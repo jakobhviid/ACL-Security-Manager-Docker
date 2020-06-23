@@ -5,15 +5,12 @@ if [ -z "$AUTHORIZER_ZOOKEEPER_CONNECT" ]; then
     exit 1
 fi
 
-if [ -z "$ACL_KERBEROS_ZOOKEEPER_PRINCIPAL" ]; then
-    echo -e "\e[1;32mERROR - Missing 'ACL_KERBEROS_ZOOKEEPER_PRINCIPAL' \e[0m"
+if [[ -z "${ACL_KERBEROS_PUBLIC_URL}" ]]; then
+    echo -e "\e[1;32mERROR - Missing 'ACL_KERBEROS_PUBLIC_URL' environment variable. \e[0m"
     exit 1
 fi
 
-KEYTAB_PATH="$CONF_FILES/zkclient.keytab"
-if [[ -f "$KEYTAB_PATH" ]]; then
-    echo "INFO - Keytab file has been provided"
-else
-    echo -e "\e[1;32mERROR - Missing ZOOKEEPER KEYTAB FILE '"$CONF_FILES/zkclient.keytab"' \e[0m"
+if [[ -z "${ACL_KERBEROS_REALM}" ]]; then
+    echo -e "\e[1;32mERROR - Missing 'ACL_KERBEROS_REALM' environment variable. \e[0m"
     exit 1
 fi

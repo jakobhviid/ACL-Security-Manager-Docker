@@ -2,9 +2,11 @@ using System.Threading.Tasks;
 using API.Contracts;
 using API.DTOs.inputDTOs;
 using API.DTOs.outputDTOs;
+using API.Helpers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using static API.DTOs.inputDTOs.ACLCommon;
 
 namespace API.Controllers
 {
@@ -21,16 +23,56 @@ namespace API.Controllers
         [HttpPost(ApiRoutes.CreateNewSuperUser)]
         public ActionResult NewSuperUser(NewSuperUserDTO input)
         {
-            // Check that admin password is correct to the one supplied in environment files
+            // Check that the API KEY is correct to the one supplied in environment files
             if (!ValidAPIKey(input.APIKey))
                 return StatusCode(StatusCodes.Status403Forbidden, new GenericReturnMessageDTO { Status = 403, Message = ErrorMessages.AdminPasswordInCorrect });
 
-            // TODO: Access acls.csv and add the super user
+            // TODO: Check if all of theses entries are needed to create a super user
+            ACLHelper.AddEntry(new AccessControlEntryDTO
+            {
+                PrincipalName = input.PrincipalName,
+                    ResourceType = ResourceType.Topic,
+                    PatternType = PatternType.Literal,
+                    ResourceName = "_schemas",
+                    Operation = OperationType.All,
+                    PermissionType = PermissionType.Allow,
+                    Host = input.Host
+            });
+            ACLHelper.AddEntry(new AccessControlEntryDTO
+            {
+                PrincipalName = input.PrincipalName,
+                    ResourceType = ResourceType.Group,
+                    PatternType = PatternType.Literal,
+                    ResourceName = "schema-registry",
+                    Operation = OperationType.All,
+                    PermissionType = PermissionType.Allow,
+                    Host = input.Host
+            });
+            ACLHelper.AddEntry(new AccessControlEntryDTO
+            {
+                PrincipalName = input.PrincipalName,
+                    ResourceType = ResourceType.Topic,
+                    PatternType = PatternType.Literal,
+                    ResourceName = "*",
+                    Operation = OperationType.Describe,
+                    PermissionType = PermissionType.Allow,
+                    Host = input.Host
+            });
+            ACLHelper.AddEntry(new AccessControlEntryDTO
+            {
+                PrincipalName = input.PrincipalName,
+                    ResourceType = ResourceType.Topic,
+                    PatternType = PatternType.Literal,
+                    ResourceName = "*",
+                    Operation = OperationType.All,
+                    PermissionType = PermissionType.Allow,
+                    Host = input.Host
+            });
 
             return StatusCode(StatusCodes.Status201Created, new GenericReturnMessageDTO
             {
                 Status = 201,
-                    Message = SuccessMessages.UserCreated
+                    Message = SuccessMessages.SuperUserCreated
             });
         }
 
@@ -46,14 +88,14 @@ namespace API.Controllers
             return StatusCode(StatusCodes.Status201Created, new GenericReturnMessageDTO
             {
                 Status = 201,
-                    Message = SuccessMessages.UserCreated // TODO: Change return message
+                    Message = SuccessMessages.SuperUserCreated // TODO: Change return message
             });
         }
 
         [HttpGet(ApiRoutes.ReadAccessControlEntry)]
         public ActionResult ReadAccessControlEntry(ReadAccessControlEntryDTO input)
         {
-            // Check that admin password is correct to the one supplied in environment files
+            // Check that the API KEY is correct to the one supplied in environment files
             if (!ValidAPIKey(input.APIKey))
                 return StatusCode(StatusCodes.Status403Forbidden, new GenericReturnMessageDTO { Status = 403, Message = ErrorMessages.AdminPasswordInCorrect });
 
@@ -62,14 +104,14 @@ namespace API.Controllers
             return StatusCode(StatusCodes.Status200OK, new GenericReturnMessageDTO
             {
                 Status = 200,
-                    Message = SuccessMessages.UserCreated // TODO: Change return message
+                    Message = SuccessMessages.SuperUserCreated // TODO: Change return message
             });
         }
 
         [HttpPatch(ApiRoutes.UpdateAccessControlEntry)]
         public ActionResult UpdateAccessControlEntry(UpdateAccessControlEntryDTO input)
         {
-            // Check that admin password is correct to the one supplied in environment files
+            // Check that the API KEY is correct to the one supplied in environment files
             if (!ValidAPIKey(input.APIKey))
                 return StatusCode(StatusCodes.Status403Forbidden, new GenericReturnMessageDTO { Status = 403, Message = ErrorMessages.AdminPasswordInCorrect });
 
@@ -78,14 +120,14 @@ namespace API.Controllers
             return StatusCode(StatusCodes.Status200OK, new GenericReturnMessageDTO
             {
                 Status = 200,
-                    Message = SuccessMessages.UserCreated // TODO: Change return message
+                    Message = SuccessMessages.SuperUserCreated // TODO: Change return message
             });
         }
 
         [HttpPatch(ApiRoutes.DeleteAccessControlEntry)]
         public ActionResult DeleteAccessControlEntry(DeleteAccessControlEntryDTO input)
         {
-            // Check that admin password is correct to the one supplied in environment files
+            // Check that the API KEY is correct to the one supplied in environment files
             if (!ValidAPIKey(input.APIKey))
                 return StatusCode(StatusCodes.Status403Forbidden, new GenericReturnMessageDTO { Status = 403, Message = ErrorMessages.AdminPasswordInCorrect });
 
@@ -94,7 +136,7 @@ namespace API.Controllers
             return StatusCode(StatusCodes.Status200OK, new GenericReturnMessageDTO
             {
                 Status = 200,
-                    Message = SuccessMessages.UserCreated // TODO: Change return message
+                    Message = SuccessMessages.SuperUserCreated // TODO: Change return message
             });
         }
 

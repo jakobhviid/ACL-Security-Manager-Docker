@@ -2,11 +2,11 @@
 
 . helpers.sh
 
-zookeeper_keytab_location="$CONF_FILES/zkclient.keytab"
+zookeeper_keytab_location="$CONF_FILES"/zkclient.keytab
 # If they haven't provided their own keytabs in volumes, it is tested if they have provided the necessary environment variables to download the keytab from an API
 if [[ -z "${ACL_ZOOKEEPER_KERBEROS_PRINCIPAL}" ]]; then
     if [[ -z "${ACL_KERBEROS_API_URL}" ]]; then
-        echo -e "\e[1;32mERROR - One of either 'ACL_ZOOKEEPER_KERBEROS_PRINCIPAL' or 'ACL_KERBEROS_API_URL' must be supplied!! \e[0m"
+        echo -e "\e[1;32mERROR - One of either 'ACL_ZOOKEEPER_KERBEROS_PRINCIPAL' or 'ACL_KERBEROS_API_URL' must be supplied \e[0m"
         exit 1
     else # the user wants to use a kerberos api to get keytabs
 
@@ -22,7 +22,7 @@ if [[ -z "${ACL_ZOOKEEPER_KERBEROS_PRINCIPAL}" ]]; then
 
         export ACL_ZOOKEEPER_KERBEROS_PRINCIPAL="$ACL_KERBEROS_API_ZOOKEEPER_USERNAME"@"$ACL_KERBEROS_REALM"
         # response will be 'FAIL' if it can't connect or if the url returned an error
-        response=$(curl --fail -X GET -H "Content-Type: application/json" -d "{\"username\":\""$ACL_KERBEROS_API_ZOOKEEPER_USERNAME"\", \"password\":\""$ACL_KERBEROS_API_ZOOKEEPER_PASSWORD"\"}" "$ACL_KERBEROS_API_URL" -o "$zookeeper_keytab_location" && echo "INFO - Using the keytab from the API and a principal name of '"$ACL_KERBEROS_API_ZOOKEEPER_USERNAME"'@'"$ACL_KERBEROS_REALM"'" || echo "FAIL")
+        response=$(curl --fail -X POST -H "Content-Type: application/json" -d "{\"username\":\""$ACL_KERBEROS_API_ZOOKEEPER_USERNAME"\", \"password\":\""$ACL_KERBEROS_API_ZOOKEEPER_PASSWORD"\"}" "$ACL_KERBEROS_API_URL" -o "$zookeeper_keytab_location" --create-dirs && echo "INFO - Using the keytab from the API and a principal name of '"$ACL_KERBEROS_API_ZOOKEEPER_USERNAME"'@'"$ACL_KERBEROS_REALM"'" || echo "FAIL")
         if [ "$response" == "FAIL" ]; then
             echo -e "\e[1;32mERROR - Kerberos API did not succeed when fetching zookeeper keytab. See curl error above for further details \e[0m"
             exit 1
@@ -41,6 +41,8 @@ fi
 # Setting the principal which will either be from the environment variable or the export if the kerberos API is to be used
 set_principal_in_jaas_file "$CONF_FILES"/jaas.conf "$ACL_ZOOKEEPER_KERBEROS_PRINCIPAL"
 
+# configuring krb5.conf files so acl-manager can communicate with the kerberos server and ensure the provided keytab is correct
+configure_kerberos_server_in_krb5_file "$ACL_KERBEROS_REALM" "$ACL_KERBEROS_PUBLIC_URL"
 
 
 if [[ -f "$ACLS_PATH" ]]; then

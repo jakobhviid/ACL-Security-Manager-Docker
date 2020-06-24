@@ -12,22 +12,39 @@ namespace API.Helpers
     public static class ACLHelper
     {
         private static string ACLFilePath = "/Users/oliver/OfflineDocuments/GitProjects/Arbejde/ACL-Security-Manager-Docker/acls.csv";
-        public static void AddEntry(AccessControlEntryDTO input)
+        public static void AddEntries(List<AccessControlEntryDTO> entries)
         {
-            FileExists();
+            var newRecords = new List<ACLEntryDefinition>();
+            foreach (var entry in entries)
+            {
+                newRecords.Add(new ACLEntryDefinition
+                {
+                    KafkaPrincipal = "User:" + entry.PrincipalName,
+                        ResourceType = entry.ResourceType.ToString(),
+                        PatternType = entry.PatternType.ToString(),
+                        ResourceName = entry.ResourceName,
+                        Operation = entry.Operation.ToString(),
+                        PermissionType = entry.PermissionType.ToString(),
+                        Host = entry.Host
+                });
+            }
+            if (File.Exists(ACLFilePath))
+            {
+                using(var reader = new StreamReader(ACLFilePath))
+                using(var csvReader = new CsvReader(reader, CultureInfo.InvariantCulture))
+                {
+                    var existingRecords = csvReader.GetRecords<ACLEntryDefinition>();
+                    newRecords.AddRange(existingRecords);
+                }
+            }
             using(StreamWriter writer = new StreamWriter(ACLFilePath))
             using(var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
             {
-                csv.WriteRecord(new ACLEntryDefinition
-                {
-                    KafkaPrincipal = "User:" + input.PrincipalName,
-                        ResourceType = input.ResourceType.ToString(),
-                        PatternType = input.PatternType.ToString(),
-                        ResourceName = input.ResourceName,
-                        Operation = input.Operation.ToString(),
-                        PermissionType = input.PermissionType.ToString(),
-                        Host = input.Host
-                });
+                csv.WriteHeader<ACLEntryDefinition>();
+                
+                csv.NextRecord(); // Flushes the writer and appends a new line. Ready to write the new records
+                
+                csv.WriteRecords<ACLEntryDefinition>(newRecords);
             }
         }
 
@@ -71,18 +88,6 @@ namespace API.Helpers
                 }
             }
             return foundEntries;
-        }
-
-        // Checks that acls.csv exists and if it doesn't, it will set the header correctly.
-        private static void FileExists()
-        {
-            if (!File.Exists(ACLFilePath))
-            {
-                using(StreamWriter sw = File.CreateText(ACLFilePath))
-                {
-                    sw.WriteLine("KafkaPrincipal,ResourceType,PatternType,ResourceName,Operation,PermissionType,Host");
-                }
-            }
         }
     }
 }

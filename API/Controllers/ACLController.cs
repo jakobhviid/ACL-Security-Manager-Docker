@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using API.Contracts;
 using API.DTOs.inputDTOs;
@@ -28,46 +29,50 @@ namespace API.Controllers
                 return StatusCode(StatusCodes.Status403Forbidden, new GenericReturnMessageDTO { Status = 403, Message = ErrorMessages.AdminPasswordInCorrect });
 
             // TODO: Check if all of theses entries are needed to create a super user
-            ACLHelper.AddEntry(new AccessControlEntryDTO
+            var superUserEntries = new List<AccessControlEntryDTO>()
             {
+                new AccessControlEntryDTO
+                {
                 PrincipalName = input.PrincipalName,
-                    ResourceType = ResourceType.Topic,
-                    PatternType = PatternType.Literal,
-                    ResourceName = "_schemas",
-                    Operation = OperationType.All,
-                    PermissionType = PermissionType.Allow,
-                    Host = input.Host
-            });
-            ACLHelper.AddEntry(new AccessControlEntryDTO
-            {
+                ResourceType = ResourceType.Topic,
+                PatternType = PatternType.Literal,
+                ResourceName = "_schemas",
+                Operation = OperationType.All,
+                PermissionType = PermissionType.Allow,
+                Host = input.Host
+                },
+                new AccessControlEntryDTO
+                {
                 PrincipalName = input.PrincipalName,
-                    ResourceType = ResourceType.Group,
-                    PatternType = PatternType.Literal,
-                    ResourceName = "schema-registry",
-                    Operation = OperationType.All,
-                    PermissionType = PermissionType.Allow,
-                    Host = input.Host
-            });
-            ACLHelper.AddEntry(new AccessControlEntryDTO
-            {
+                ResourceType = ResourceType.Group,
+                PatternType = PatternType.Literal,
+                ResourceName = "schema-registry",
+                Operation = OperationType.All,
+                PermissionType = PermissionType.Allow,
+                Host = input.Host
+                },
+                new AccessControlEntryDTO
+                {
                 PrincipalName = input.PrincipalName,
-                    ResourceType = ResourceType.Topic,
-                    PatternType = PatternType.Literal,
-                    ResourceName = "*",
-                    Operation = OperationType.Describe,
-                    PermissionType = PermissionType.Allow,
-                    Host = input.Host
-            });
-            ACLHelper.AddEntry(new AccessControlEntryDTO
-            {
+                ResourceType = ResourceType.Topic,
+                PatternType = PatternType.Literal,
+                ResourceName = "*",
+                Operation = OperationType.Describe,
+                PermissionType = PermissionType.Allow,
+                Host = input.Host
+                },
+                new AccessControlEntryDTO
+                {
                 PrincipalName = input.PrincipalName,
-                    ResourceType = ResourceType.Topic,
-                    PatternType = PatternType.Literal,
-                    ResourceName = "*",
-                    Operation = OperationType.All,
-                    PermissionType = PermissionType.Allow,
-                    Host = input.Host
-            });
+                ResourceType = ResourceType.Topic,
+                PatternType = PatternType.Literal,
+                ResourceName = "*",
+                Operation = OperationType.All,
+                PermissionType = PermissionType.Allow,
+                Host = input.Host
+                }
+            };
+            ACLHelper.AddEntries(superUserEntries);
 
             return StatusCode(StatusCodes.Status201Created, new GenericReturnMessageDTO
             {
@@ -140,9 +145,10 @@ namespace API.Controllers
             });
         }
 
-        private bool ValidAPIKey(string adminPassword)
+        private bool ValidAPIKey(string apiKey)
         {
-            return adminPassword.Equals(_configuration["KERBEROS_ADMIN_PW"]);
+            // return apiKey.Equals(_configuration["ACL_API_KEY"]);
+            return apiKey.Equals("test");
         }
     }
 }

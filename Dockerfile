@@ -38,6 +38,12 @@ ENV ACLS_PATH=${CONF_FILES}/acls.csv
 ENV API_HOME=/opt/api
 ENV ASPNETCORE_ENVIRONMENT=Production
 
+# acl manager environment variables
+ENV SOURCE_CLASS="com.github.simplesteph.ksm.source.FileSourceAcl"
+ENV SOURCE_FILE_FILENAME=${ACLS_PATH}
+ENV KSM_READONLY="false"
+
+# copy acl manager code over
 COPY ./acl-manager-code ${ACL_MANAGER_HOME}
 
 # Copy scripts
@@ -51,5 +57,7 @@ COPY --from=build /build/out ${API_HOME}
 RUN mkdir ${CONF_FILES}
 
 COPY ./configuration/ ${CONF_FILES}/
+
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 CMD [ "docker-entrypoint.sh" ]

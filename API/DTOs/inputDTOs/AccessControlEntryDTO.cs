@@ -32,15 +32,5 @@ namespace API.DTOs.inputDTOs
         {
             return $"{PrincipalName},{ResourceType},{PatternType},{ResourceName},{Operation},{PermissionType},{Host}";
         }
-        public bool EqualsCsvEntry(ACLEntryDefinition comparison)
-        {
-            return this.PrincipalName.Equals(comparison.KafkaPrincipal) &&
-                this.ResourceType.ToString().Equals(comparison.ResourceType) &&
-                this.PatternType.ToString().Equals(comparison.PatternType) &&
-                this.ResourceName.Equals(comparison.ResourceName) &&
-                this.Operation.ToString().Equals(comparison.Operation) &&
-                this.PermissionType.ToString().Equals(comparison.PermissionType) &&
-                this.Host.Equals(comparison.Host);
-        }
     }
 }

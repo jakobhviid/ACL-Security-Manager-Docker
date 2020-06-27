@@ -5,87 +5,73 @@ using System.IO;
 using System.Linq;
 using API.Contracts;
 using API.DTOs.inputDTOs;
-using CsvHelper;
+using static API.DTOs.inputDTOs.ACLCommon;
 
 namespace API.Helpers
 {
     public static class ACLHelper
     {
-        private static string ACLFilePath = "/Users/oliver/OfflineDocuments/GitProjects/Arbejde/ACL-Security-Manager-Docker/acls.csv";
+        private static string ACLFilePath = "/conf/acls.csv";
         public static void AddEntries(List<AccessControlEntryDTO> entries)
         {
-            var newRecords = new List<ACLEntryDefinition>();
+            if (!File.Exists(ACLFilePath))throw new ArgumentException(ErrorMessages.ACLFileDoesNotExist);
+
+            var recordsToAdd = new List<string>();
             foreach (var entry in entries)
             {
-                newRecords.Add(new ACLEntryDefinition
-                {
-                    KafkaPrincipal = "User:" + entry.PrincipalName,
-                        ResourceType = entry.ResourceType.ToString(),
-                        PatternType = entry.PatternType.ToString(),
-                        ResourceName = entry.ResourceName,
-                        Operation = entry.Operation.ToString(),
-                        PermissionType = entry.PermissionType.ToString(),
-                        Host = entry.Host
-                });
+                recordsToAdd.Add($"User:{entry.PrincipalName}," +
+                    $"{entry.ResourceType.ToString()}," +
+                    $"{entry.PatternType.ToString()}," +
+                    $"{entry.ResourceName}," +
+                    $"{entry.Operation.ToString()}," +
+                    $"{entry.PermissionType.ToString()}," +
+                    $"{entry.Host}");
             }
-            if (File.Exists(ACLFilePath))
-            {
-                using(var reader = new StreamReader(ACLFilePath))
-                using(var csvReader = new CsvReader(reader, CultureInfo.InvariantCulture))
-                {
-                    var existingRecords = csvReader.GetRecords<ACLEntryDefinition>();
-                    newRecords.AddRange(existingRecords);
-                }
-            }
-            using(StreamWriter writer = new StreamWriter(ACLFilePath))
-            using(var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
-            {
-                csv.WriteHeader<ACLEntryDefinition>();
-                
-                csv.NextRecord(); // Flushes the writer and appends a new line. Ready to write the new records
-                
-                csv.WriteRecords<ACLEntryDefinition>(newRecords);
-            }
+            File.AppendAllLines(ACLFilePath, recordsToAdd);
         }
 
         // This method uses very little memory, as the acls.csv file can become very big
-        public static void DeleteEntry(AccessControlEntryDTO input)
+        public static void DeleteEntry(AccessControlEntryDTO entry)
         {
-            if (!File.Exists(ACLFilePath))throw new ArgumentException(SuccessMessages.ACLEntryDoesNotExist);
+            if (!File.Exists(ACLFilePath))throw new ArgumentException(ErrorMessages.ACLFileDoesNotExist);
 
-            using(var reader = new StreamReader(ACLFilePath))
-            using(var csvReader = new CsvReader(reader, CultureInfo.InvariantCulture)) // invairant culture has to do with date & time conversion
-            {
-                var entries = csvReader.GetRecords<ACLEntryDefinition>();
-                // Filter list
-                var updatedEntries = new List<ACLEntryDefinition>();
-                foreach (var csvEntry in entries)
-                {
-                    if (!input.EqualsCsvEntry(csvEntry))updatedEntries.Add(csvEntry);
-                }
+            var entryToDelete = $"User:{entry.PrincipalName}," +
+                $"{entry.ResourceType.ToString()}," +
+                $"{entry.PatternType.ToString()}," +
+                $"{entry.ResourceName}," +
+                $"{entry.Operation.ToString()}," +
+                $"{entry.PermissionType.ToString()}," +
+                $"{entry.Host}";
 
-                using(var writer = new StreamWriter(ACLFilePath))
-                using(var csvWriter = new CsvWriter(writer, CultureInfo.InvariantCulture))
-                {
-                    csvWriter.WriteRecords(updatedEntries);
-                }
-            }
+            var linesToKeep = File.ReadAllLines(ACLFilePath).Where(l => !l.Equals(entry));
+
+            // Overwriting the original file. We cannot use a temporary file and switch them around as it causes acl-manager to throw an error
+
+            File.WriteAllText(ACLFilePath, "KafkaPrincipal,ResourceType,PatternType,ResourceName,Operation,PermissionType,Host"); // Writing the header, overwriting the file
+            File.WriteAllLines(ACLFilePath, linesToKeep); // Adding all the lines we still want to keep
+
         }
 
-        public static List<ACLEntryDefinition> FetchEntriesForPrincipal(ReadAccessControlEntryDTO input)
+        public static List<AccessControlEntryDTO> FetchEntriesForPrincipal(ReadAccessControlEntryDTO input)
         {
-            if (!File.Exists(ACLFilePath))throw new ArgumentException(SuccessMessages.ACLEntryDoesNotExist);
+            if (!File.Exists(ACLFilePath))throw new ArgumentException(ErrorMessages.ACLFileDoesNotExist);
 
-            List<ACLEntryDefinition> foundEntries = new List<ACLEntryDefinition>();
-
-            using(var reader = new StreamReader(ACLFilePath))
-            using(var csv = new CsvReader(reader, CultureInfo.InvariantCulture)) // invairant culture has to do with date & time conversion
+            var foundEntriesInFile = File.ReadAllLines(ACLFilePath).Where(l => l.Contains($"User:{input.PrincipalName}"));
+            List<AccessControlEntryDTO> foundEntries = new List<AccessControlEntryDTO>();
+            foreach (var foundEntry in foundEntriesInFile)
             {
-                var entries = csv.GetRecords<ACLEntryDefinition>();
-                foreach (var entry in entries)
+                var splittedParams = foundEntry.Split(",");
+                // TODO: Try catch for each splitted argument, in case somehow an entry is added where it doesn't exist
+                foundEntries.Add(new AccessControlEntryDTO
                 {
-                    if (entry.KafkaPrincipal.Equals(input.PrincipalName))foundEntries.Add(entry);
-                }
+                    PrincipalName = splittedParams[0],
+                        ResourceType = (ResourceType)Enum.Parse(typeof(ResourceType), splittedParams[1], true),
+                        PatternType = (PatternType)Enum.Parse(typeof(PatternType), splittedParams[2], true),
+                        ResourceName = splittedParams[3],
+                        Operation = (OperationType)Enum.Parse(typeof(OperationType), splittedParams[4], true),
+                        PermissionType = (PermissionType)Enum.Parse(typeof(PermissionType), splittedParams[5], true),
+                        Host = splittedParams[6]
+                });
             }
             return foundEntries;
         }

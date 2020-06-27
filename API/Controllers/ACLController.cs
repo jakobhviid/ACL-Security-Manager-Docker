@@ -26,7 +26,7 @@ namespace API.Controllers
         {
             // Check that the API KEY is correct to the one supplied in environment files
             if (!ValidAPIKey(input.APIKey))
-                return StatusCode(StatusCodes.Status403Forbidden, new GenericReturnMessageDTO { Status = 403, Message = ErrorMessages.AdminPasswordInCorrect });
+                return StatusCode(StatusCodes.Status403Forbidden, new GenericReturnMessageDTO { Status = 403, Message = ErrorMessages.APIKeyIncorrect });
 
             // TODO: Check if all of theses entries are needed to create a super user
             var superUserEntries = new List<AccessControlEntryDTO>()
@@ -86,7 +86,7 @@ namespace API.Controllers
         {
             // Check that admin password is correct to the one supplied in environment files
             if (!ValidAPIKey(input.APIKey))
-                return StatusCode(StatusCodes.Status403Forbidden, new GenericReturnMessageDTO { Status = 403, Message = ErrorMessages.AdminPasswordInCorrect });
+                return StatusCode(StatusCodes.Status403Forbidden, new GenericReturnMessageDTO { Status = 403, Message = ErrorMessages.APIKeyIncorrect });
 
             // TODO: Create new entry in acls.csv
 
@@ -102,7 +102,7 @@ namespace API.Controllers
         {
             // Check that the API KEY is correct to the one supplied in environment files
             if (!ValidAPIKey(input.APIKey))
-                return StatusCode(StatusCodes.Status403Forbidden, new GenericReturnMessageDTO { Status = 403, Message = ErrorMessages.AdminPasswordInCorrect });
+                return StatusCode(StatusCodes.Status403Forbidden, new GenericReturnMessageDTO { Status = 403, Message = ErrorMessages.APIKeyIncorrect });
 
             // TODO: Get entry in acls.csv
 
@@ -118,7 +118,7 @@ namespace API.Controllers
         {
             // Check that the API KEY is correct to the one supplied in environment files
             if (!ValidAPIKey(input.APIKey))
-                return StatusCode(StatusCodes.Status403Forbidden, new GenericReturnMessageDTO { Status = 403, Message = ErrorMessages.AdminPasswordInCorrect });
+                return StatusCode(StatusCodes.Status403Forbidden, new GenericReturnMessageDTO { Status = 403, Message = ErrorMessages.APIKeyIncorrect });
 
             // TODO: Update entry in acls.csv
 
@@ -134,7 +134,7 @@ namespace API.Controllers
         {
             // Check that the API KEY is correct to the one supplied in environment files
             if (!ValidAPIKey(input.APIKey))
-                return StatusCode(StatusCodes.Status403Forbidden, new GenericReturnMessageDTO { Status = 403, Message = ErrorMessages.AdminPasswordInCorrect });
+                return StatusCode(StatusCodes.Status403Forbidden, new GenericReturnMessageDTO { Status = 403, Message = ErrorMessages.APIKeyIncorrect });
 
             // TODO: Delete entry in acls.csv
 
@@ -147,8 +147,7 @@ namespace API.Controllers
 
         private bool ValidAPIKey(string apiKey)
         {
-            // return apiKey.Equals(_configuration["ACL_API_KEY"]);
-            return apiKey.Equals("test");
+            return apiKey.Equals(_configuration["ACL_API_KEY"]);
         }
     }
 }

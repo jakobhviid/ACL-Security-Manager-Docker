@@ -4,6 +4,5 @@ namespace API.Contracts
     {
         public const string SuperUserCreated = "Super user successfully created";
         public const string ServiceCreated = "Service successfully created";
-        public const string ACLEntryDoesNotExist = "Entry does not exist";
     }
 }

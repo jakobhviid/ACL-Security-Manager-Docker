@@ -26,6 +26,7 @@ namespace API.DTOs.inputDTOs
         public PermissionType PermissionType { get; set; }
 
         [Required]
+
         public string Host { get; set; }
 
         public override string ToString()

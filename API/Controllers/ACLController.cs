@@ -28,6 +28,8 @@ namespace API.Controllers
             if (!ValidAPIKey(input.APIKey))
                 return StatusCode(StatusCodes.Status403Forbidden, new GenericReturnMessageDTO { Status = 403, Message = ErrorMessages.APIKeyIncorrect });
 
+            if (input.Host == null)input.Host = "*";
+
             // TODO: Check if all of theses entries are needed to create a super user
             var superUserEntries = new List<AccessControlEntryDTO>()
             {

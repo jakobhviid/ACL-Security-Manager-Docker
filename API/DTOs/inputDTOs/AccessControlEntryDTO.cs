@@ -6,7 +6,6 @@ namespace API.DTOs.inputDTOs
 {
     public class AccessControlEntryDTO
     {
-
         [Required]
         public string PrincipalName { get; set; }
 

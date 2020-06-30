@@ -131,7 +131,7 @@ namespace API.Controllers
             });
         }
 
-        [HttpPatch(ApiRoutes.DeleteAccessControlEntry)]
+        [HttpDelete(ApiRoutes.DeleteAccessControlEntry)]
         public ActionResult DeleteAccessControlEntry(DeleteAccessControlEntryDTO input)
         {
             // Check that the API KEY is correct to the one supplied in environment files

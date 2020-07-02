@@ -14,7 +14,7 @@ version: "3"
 
 services:
   acl-manager:
-    image: omvk97/acl-manager
+    image: cfei/acl-security-manager
     container_name: acl-manager
     ports:
       - 9000:9000

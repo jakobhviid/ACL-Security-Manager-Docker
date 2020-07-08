@@ -22,7 +22,7 @@ if [[ -z "${ACL_ZOOKEEPER_KERBEROS_PRINCIPAL}" ]]; then
 
         export ACL_ZOOKEEPER_KERBEROS_PRINCIPAL="$ACL_KERBEROS_API_ZOOKEEPER_USERNAME"@"$ACL_KERBEROS_REALM"
         # response will be 'FAIL' if it can't connect or if the url returned an error
-        response=$(curl --fail --max-time 5 -X POST -H "Content-Type: application/json" -d "{\"username\":\""$ACL_KERBEROS_API_ZOOKEEPER_USERNAME"\", \"password\":\""$ACL_KERBEROS_API_ZOOKEEPER_PASSWORD"\"}" "$ACL_KERBEROS_API_URL" -o "$zookeeper_keytab_location" --create-dirs && echo "INFO - Using the keytab from the API and a principal name of '"$ACL_KERBEROS_API_ZOOKEEPER_USERNAME"'@'"$ACL_KERBEROS_REALM"'" || echo "FAIL")
+        response=$(curl --fail --connect-timeout 5 --retry 5 --retry-delay 5 --retry-max-time 30 --retry-connrefused --max-time 5 -X POST -H "Content-Type: application/json" -d "{\"username\":\""$ACL_KERBEROS_API_ZOOKEEPER_USERNAME"\", \"password\":\""$ACL_KERBEROS_API_ZOOKEEPER_PASSWORD"\"}" "$ACL_KERBEROS_API_URL" -o "$zookeeper_keytab_location" --create-dirs && echo "INFO - Using the keytab from the API and a principal name of '"$ACL_KERBEROS_API_ZOOKEEPER_USERNAME"'@'"$ACL_KERBEROS_REALM"'" || echo "FAIL")
         if [ "$response" == "FAIL" ]; then
             echo -e "\e[1;32mERROR - Kerberos API did not succeed when fetching zookeeper keytab. See curl error above for further details \e[0m"
             exit 1

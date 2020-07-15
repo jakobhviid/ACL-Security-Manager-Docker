@@ -1,6 +1,6 @@
 function set_principal_in_jaas_file() {
     if [ "$#" -ne 2 ]; then
-        echo -e "\e[1;32mset_principal_in_jaas_file not used correctly! Provide two parameters! First is jaas file path. Second is the new principal value\e[0m"
+        echo -e "\e[1;31mset_principal_in_jaas_file not used correctly! Provide two parameters! First is jaas file path. Second is the new principal value\e[0m"
     else
         # Escaping argument 2 for special characters
         sed -i -r -E "/principal=/ s/=.*/=\"$(echo $2 | sed -e 's#\([]*^+.$[/]\)#\\\1#g')\";/" $1
@@ -9,7 +9,7 @@ function set_principal_in_jaas_file() {
 
 function configure_kerberos_server_in_krb5_file() {
     if [ "$#" -ne 2 ]; then
-        echo -e "\e[1;32mconfigure_kerberos_server_in_krb5_file not used correctly! Provide two parameters (public url of kerberos server and kerberos realm) \e[0m"
+        echo -e "\e[1;31mconfigure_kerberos_server_in_krb5_file not used correctly! Provide two parameters (public url of kerberos server and kerberos realm) \e[0m"
     else
         echo "[realms]
         "$1" = {

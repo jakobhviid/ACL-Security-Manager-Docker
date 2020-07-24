@@ -19,7 +19,7 @@ LABEL MAINTAINER="Oliver Marco van Komen"
 ENV DEBIAN_FRONTEND=noninteractive 
 
 RUN apt-get update && \
-    apt-get install -y wget curl && \
+    apt-get install -y net-tools wget curl && \
     apt-get install -y --no-install-recommends openjdk-11-jre-headless && \
     apt-get install -y krb5-user && \
     apt-get install -y supervisor
@@ -30,7 +30,6 @@ RUN wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-p
     apt-get update && \
     apt-get install -y apt-transport-https && \
     apt-get install aspnetcore-runtime-3.1 curl -y
-
 
 ENV ACL_MANAGER_HOME=/opt/manager
 ENV CONF_FILES=/conf

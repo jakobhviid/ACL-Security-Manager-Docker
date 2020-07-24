@@ -74,7 +74,7 @@ This endpoint deletes a single rule
 
 - `ACL_API_KEY`: The API key to use. This can be used for everything in this image, so store it safely! Required.
 
-- `ACL_KERBEROS_API_URL`: The URL to use when the image fetches the zookeeper keytab from a kerberos server. The URL has to point to an HTTP GET Endpoint. The image will then supply the values of 'ACL_KERBEROS_API_ZOOKEEPER_USERNAME' and 'ACL_KERBEROS_API_ZOOKEEPER_PASSWORD' to the GET request. Required if a keytab is not provided through volumes.
+- `ACL_KERBEROS_API_URL`: The URL to use when the image fetches the zookeeper keytab from a kerberos server. The URL has to point to an HTTP POST Endpoint. The image will then supply the values of 'ACL_KERBEROS_API_ZOOKEEPER_USERNAME' and 'ACL_KERBEROS_API_ZOOKEEPER_PASSWORD' to the POST request. Required if a keytab is not provided through volumes.
 
 - `ACL_KERBEROS_API_ZOOKEEPER_USERNAME`: The username to use when fetching the zookeeper keytab. Required if a keytab is not provided through volumes.
 

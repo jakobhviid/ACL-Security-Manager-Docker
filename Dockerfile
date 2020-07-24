@@ -26,11 +26,11 @@ RUN apt-get update && \
 
 # Installing aspnetcore runtime. This is in a seperate block as it is subject to change pretty often
 RUN wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb && \
-    dpkg -i packages-microsoft-prod.deb && \
+    dpkg --purge packages-microsoft-prod && dpkg -i packages-microsoft-prod.deb && \
     apt-get update && \
     apt-get install -y apt-transport-https && \
-    apt-get update && \
-    apt-get install -y dotnet-sdk-3.1
+    apt-get install aspnetcore-runtime-3.1 curl -y
+
 
 ENV ACL_MANAGER_HOME=/opt/manager
 ENV CONF_FILES=/conf

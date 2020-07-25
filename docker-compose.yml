@@ -2,17 +2,17 @@ version: "3"
 
 services:
   acl-manager:
-    image: omvk97/acl-manager:1.0.1
+    image: omvk97/acl-manager:1.0.8
     container_name: acl-manager
     ports:
       - 9000:9000
     environment:
-      AUTHORIZER_ZOOKEEPER_CONNECT: 64.227.69.203:2181
+      AUTHORIZER_ZOOKEEPER_CONNECT: 134.209.92.166:2181
       ACL_API_PORT: 9000
       ACL_API_KEY: password
-      ACL_KERBEROS_API_URL: "http://64.227.69.203:6000/get-keytab"
-      ACL_KERBEROS_API_ZOOKEEPER_USERNAME: zookeeper/64.227.69.203
+      ACL_KERBEROS_API_URL: "http://134.209.92.166:6000/get-keytab"
+      ACL_KERBEROS_API_ZOOKEEPER_USERNAME: zookeeper/134.209.92.166
       ACL_KERBEROS_API_ZOOKEEPER_PASSWORD: zookeeperPassword
       ACL_KERBEROS_REALM: KAFKA.SECURE
-      ACL_KERBEROS_PUBLIC_URL: 64.227.69.203
+      ACL_KERBEROS_PUBLIC_URL: 134.209.92.166
       ACL_INIT_USERS: "zookeeper,dashboardserver,dashboardinterface"

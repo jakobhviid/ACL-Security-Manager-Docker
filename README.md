@@ -19,7 +19,7 @@ services:
     ports:
       - 9000:9000
     environment:
-      AUTHORIZER_ZOOKEEPER_CONNECT: <<ZOOKEEPER_URL>>:2181
+      AUTHORIZER_ZOOKEEPER_CONNECT: <<ZOOKEEPER_URL>>:2181/kafka
       ACL_API_PORT: 9000
       ACL_API_KEY: cfei-key
       ACL_KERBEROS_API_URL: "<<CFEI_KERBEROS_API_URL>>/get-keytab"
@@ -68,7 +68,7 @@ This endpoint deletes a single rule
 
 # Configuration
 
-- `AUTHORIZER_ZOOKEEPER_CONNECT`: The DNS-resolvable zookeeper url to authorize and store acls in. This environment variable supports a comma seperated list of zookeeper urls. Required.
+- `AUTHORIZER_ZOOKEEPER_CONNECT`: The DNS-resolvable zookeeper url to authorize and store acls in. This environment variable supports a comma seperated list of zookeeper urls. **Note**: CFEI kafka setup by default adds a chroot /kafka to zookeeper. Therefore this should include /kafka if you use our CFEI kafka setup. Required.
 
 - `ACL_API_PORT`: The port on which the API will listen for connections. Required.
 

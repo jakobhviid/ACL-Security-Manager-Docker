@@ -2,6 +2,12 @@
 
 . helpers.sh
 
+# It does not contain /kafka chroot ...
+if [[ "$AUTHORIZER_ZOOKEEPER_CONNECT" != *"/kafka"* ]]; then
+    # Warning the user that is most likely should include chroot /kafka
+    echo -e "\e[1;33m WARNING - 'AUTHORIZER_ZOOKEEPER_CONNECT' missing chroot suffix, if you use CFEI kafka this is most likely a mistake. \e[0m"
+fi
+
 zookeeper_keytab_location="$CONF_FILES"/zkclient.keytab
 # If they haven't provided their own keytabs in volumes, it is tested if they have provided the necessary environment variables to download the keytab from an API
 if [[ -z "${ACL_ZOOKEEPER_KERBEROS_PRINCIPAL}" ]]; then
@@ -26,7 +32,7 @@ if [[ -z "${ACL_ZOOKEEPER_KERBEROS_PRINCIPAL}" ]]; then
         if [ "$response" == "FAIL" ]; then
             echo -e "\e[1;31mERROR - Kerberos API did not succeed when fetching zookeeper keytab. Retrying in 5 seconds \e[0m"
             sleep 5
-            
+
             # Retrying
             response=$(curl --fail --connect-timeout 5 --retry 5 --retry-delay 5 --retry-max-time 30 --retry-connrefused --max-time 5 -X POST -H "Content-Type: application/json" -d "{\"username\":\""$ACL_KERBEROS_API_ZOOKEEPER_USERNAME"\", \"password\":\""$ACL_KERBEROS_API_ZOOKEEPER_PASSWORD"\"}" "$ACL_KERBEROS_API_URL" -o "$zookeeper_keytab_location" --create-dirs && echo "INFO - Using the keytab from the API and a principal name of '"$ACL_KERBEROS_API_ZOOKEEPER_USERNAME"'@'"$ACL_KERBEROS_REALM"'" || echo "FAIL")
             if [ "$response" == "FAIL" ]; then

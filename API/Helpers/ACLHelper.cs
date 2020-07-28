@@ -21,7 +21,7 @@ namespace API.Helpers
             {
                 recordsToAdd.Add($"User:{entry.PrincipalName}," +
                     $"{entry.ResourceType.ToString()}," +
-                    $"{entry.PatternType.ToString()}," +
+                    $"{entry.PatternType.ToString().ToUpper()}," +
                     $"{entry.ResourceName}," +
                     $"{entry.Operation.ToString()}," +
                     $"{entry.PermissionType.ToString()}," +

@@ -28,45 +28,37 @@ namespace API.Controllers
             if (!ValidAPIKey(input.APIKey))
                 return StatusCode(StatusCodes.Status403Forbidden, new GenericReturnMessageDTO { Status = 403, Message = ErrorMessages.APIKeyIncorrect });
 
-            if (input.Host == null)input.Host = "*";
+            if (input.Host == null) input.Host = "*";
 
-            // TODO: Check if all of theses entries are needed to create a super user
             var superUserEntries = new List<AccessControlEntryDTO>()
             {
-                new AccessControlEntryDTO
-                {
-                PrincipalName = input.PrincipalName,
-                ResourceType = ResourceType.Topic,
-                PatternType = PatternType.Literal,
-                ResourceName = "_schemas",
-                Operation = OperationType.All,
-                PermissionType = PermissionType.Allow,
-                Host = input.Host
-                },
-                new AccessControlEntryDTO
-                {
-                PrincipalName = input.PrincipalName,
-                ResourceType = ResourceType.Group,
-                PatternType = PatternType.Literal,
-                ResourceName = "schema-registry",
-                Operation = OperationType.All,
-                PermissionType = PermissionType.Allow,
-                Host = input.Host
-                },
+                // This one gives the user access to all topics in the cluster as there is wildcard matching on topic and host (if host hasn't been defined)
                 new AccessControlEntryDTO
                 {
                 PrincipalName = input.PrincipalName,
                 ResourceType = ResourceType.Topic,
                 PatternType = PatternType.Literal,
                 ResourceName = "*",
-                Operation = OperationType.Describe,
+                Operation = OperationType.All,
                 PermissionType = PermissionType.Allow,
                 Host = input.Host
                 },
+                // This one gives the user acccess to create topics in the cluster
                 new AccessControlEntryDTO
                 {
                 PrincipalName = input.PrincipalName,
-                ResourceType = ResourceType.Topic,
+                ResourceType = ResourceType.Cluster,
+                PatternType = PatternType.Literal,
+                ResourceName = "kafka-cluster",
+                Operation = OperationType.Create,
+                PermissionType = PermissionType.Allow,
+                Host = input.Host
+                },
+                // This one makes sure that the users group doesn't matter. No matter what group the user is in, they will still be able to access all topics and create topics
+                new AccessControlEntryDTO
+                {
+                PrincipalName = input.PrincipalName,
+                ResourceType = ResourceType.Group,
                 PatternType = PatternType.Literal,
                 ResourceName = "*",
                 Operation = OperationType.All,
@@ -79,7 +71,7 @@ namespace API.Controllers
             return StatusCode(StatusCodes.Status201Created, new GenericReturnMessageDTO
             {
                 Status = 201,
-                    Message = SuccessMessages.SuperUserCreated
+                Message = SuccessMessages.SuperUserCreated
             });
         }
 
@@ -95,7 +87,7 @@ namespace API.Controllers
             return StatusCode(StatusCodes.Status201Created, new GenericReturnMessageDTO
             {
                 Status = 201,
-                    Message = SuccessMessages.SuperUserCreated // TODO: Change return message
+                Message = SuccessMessages.SuperUserCreated // TODO: Change return message
             });
         }
 
@@ -111,7 +103,7 @@ namespace API.Controllers
             return StatusCode(StatusCodes.Status200OK, new GenericReturnMessageDTO
             {
                 Status = 200,
-                    Message = SuccessMessages.SuperUserCreated // TODO: Change return message
+                Message = SuccessMessages.SuperUserCreated // TODO: Change return message
             });
         }
 
@@ -127,7 +119,7 @@ namespace API.Controllers
             return StatusCode(StatusCodes.Status200OK, new GenericReturnMessageDTO
             {
                 Status = 200,
-                    Message = SuccessMessages.SuperUserCreated // TODO: Change return message
+                Message = SuccessMessages.SuperUserCreated // TODO: Change return message
             });
         }
 
@@ -143,7 +135,7 @@ namespace API.Controllers
             return StatusCode(StatusCodes.Status200OK, new GenericReturnMessageDTO
             {
                 Status = 200,
-                    Message = SuccessMessages.SuperUserCreated // TODO: Change return message
+                Message = SuccessMessages.SuperUserCreated // TODO: Change return message
             });
         }
 

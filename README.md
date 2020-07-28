@@ -88,6 +88,8 @@ This endpoint deletes a single rule
 
 - `ACL_INIT_SUPERUSERS`: The image can create super users during startup. Super users in kafka has access to all topic and cluster actions. This environment variable has to be a comma-seperated string of kerberos principal names. (example: `ACL_INIT_SUPERUSERS: "zookeeper,kafka,dashboardserver,dashboardinterface,elonmusk"`).
 
+- `KSM_EXTRACT`: If this is set, ACL security manager will extract all already defined acls from the zookeeper/kafka cluster which you then can use as the source of truth afterwards. This is useful if your ACL-Security-Manager is restarted or go down and you lost your acls.csv file.
+
 # Volumes
 
 - `/conf/`: Two important files reside in this directory. Both the zookeeper keytab which is used to write acls and also the acls.csv file. You can provide your own keytab and acls.csv file which the image will use instead of creating it's own.

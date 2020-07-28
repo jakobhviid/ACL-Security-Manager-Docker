@@ -41,6 +41,7 @@ ENV ASPNETCORE_ENVIRONMENT=Production
 ENV SOURCE_CLASS="com.github.simplesteph.ksm.source.FileSourceAcl"
 ENV SOURCE_FILE_FILENAME=${ACLS_PATH}
 ENV KSM_READONLY="false"
+ENV AUTHORIZER_ZOOKEEPER_SET_ACL="true"
 
 # copy acl manager code over
 COPY ./acl-manager-code ${ACL_MANAGER_HOME}
@@ -55,8 +56,11 @@ COPY --from=build /build/out ${API_HOME}
 
 RUN mkdir ${CONF_FILES}
 
-COPY ./configuration/ ${CONF_FILES}/
+COPY ./configuration/krb5.conf ${CONF_FILES}/krb5.conf
+COPY ./configuration/jaas.conf ${CONF_FILES}/jaas.conf
 
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+VOLUME [ "${CONF_FILES}" ]
 
 CMD [ "docker-entrypoint.sh" ]
